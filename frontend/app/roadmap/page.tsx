@@ -1,21 +1,33 @@
-import ModuleCard from '../../components/ModuleCard';
-
 const modules = [
-  { id: 1, title: 'Git Basics', description: 'Commits, branches, and merge flow.', difficulty: 'Beginner' },
-  { id: 2, title: 'GitHub & GitLab', description: 'Repos, PRs, MRs, and CI basics.', difficulty: 'Beginner' },
-  { id: 3, title: 'Docker', description: 'Images, containers, and Dockerfiles.', difficulty: 'Beginner' },
-  { id: 4, title: 'Kubernetes', description: 'Pods, deployments, and services.', difficulty: 'Intermediate' },
+  "Git Basics",
+  "GitHub / GitLab",
+  "Docker",
+  "Container Registry",
+  "Kubernetes Basics",
+  "Services & Ingress",
+  "Rancher",
+  "CI/CD Pipeline"
 ];
 
-export default function RoadmapPage() {
+export default function Roadmap() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Learning Roadmap</h1>
-      <div className="grid gap-4 md:grid-cols-2">
-        {modules.map((module) => (
-          <ModuleCard key={module.id} {...module} />
+    <div className="min-h-screen bg-black text-white p-6">
+
+      <h1 className="text-3xl font-bold mb-8">DevOps Roadmap</h1>
+
+      <div className="grid gap-4">
+
+        {modules.map((module, index) => (
+          <div
+            key={index}
+            className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 cursor-pointer"
+          >
+            <h2 className="text-xl">{index + 1}. {module}</h2>
+          </div>
         ))}
+
       </div>
+
     </div>
   );
 }
