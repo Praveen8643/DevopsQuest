@@ -1,12 +1,25 @@
-export default function LessonPage({ params }: { params: { id: string } }) {
+"use client";
+
+import { useParams } from "next/navigation";
+
+export default function LessonPage() {
+  const { id } = useParams();
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Lesson {params.id}</h1>
-      <div className="card space-y-4">
-        <h2 className="text-xl font-semibold">What is Git?</h2>
-        <p className="text-slate-300">Git is a distributed version control system that tracks changes in files and helps teams collaborate safely.</p>
-        <button className="btn-primary">Mark Complete</button>
+    <div className="min-h-screen bg-black text-white p-6">
+
+      <h1 className="text-3xl font-bold mb-4">
+        Lesson {id}
+      </h1>
+
+      <p className="text-gray-300 mb-6">
+        This is where DevOps concept content will go.
+      </p>
+
+      <div className="bg-gray-800 p-4 rounded-lg">
+        Example: Git helps track code changes and collaborate efficiently.
       </div>
+
     </div>
   );
 }
