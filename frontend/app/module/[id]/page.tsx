@@ -1,8 +1,13 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getCompletedLessons } from "../../../lib/progress";
 
-const moduleData: Record<string, { title: string; lessons: { id: number; title: string }[] }> = {
+const moduleData: Record<
+  string,
+  { title: string; lessons: { id: number; title: string }[] }
+> = {
   "1": {
     title: "Git Basics",
     lessons: [
@@ -35,6 +40,11 @@ export default function ModulePage() {
   const id = params?.id as string;
 
   const module = moduleData[id];
+  const [completedLessons, setCompletedLessons] = useState<number[]>([]);
+
+  useEffect(() => {
+    setCompletedLessons(getCompletedLessons());
+  }, []);
 
   if (!module) {
     return (
@@ -44,26 +54,40 @@ export default function ModulePage() {
     );
   }
 
+  const completedCount = module.lessons.filter((lesson) =>
+    completedLessons.includes(lesson.id)
+  ).length;
+
   return (
     <div className="min-h-screen bg-black text-white p-6">
       <h1 className="text-3xl font-bold mb-2">{module.title}</h1>
-      <p className="text-gray-400 mb-6">Choose a lesson to begin</p>
+      <p className="text-gray-400 mb-2">Choose a lesson to begin</p>
+      <p className="text-green-400 mb-6">
+        Progress: {completedCount}/{module.lessons.length} lessons completed
+      </p>
 
       <div className="space-y-4">
-        {module.lessons.map((lesson) => (
-          <button
-            key={lesson.id}
-            type="button"
-            onClick={() => router.push(`/lesson/${lesson.id}`)}
-            className="w-full bg-gray-800 p-4 rounded-lg hover:bg-gray-700 text-left"
-          >
-            {lesson.title}
-          </button>
-        ))}
+        {module.lessons.map((lesson) => {
+          const isDone = completedLessons.includes(lesson.id);
+
+          return (
+            <button
+              key={lesson.id}
+              type="button"
+              onClick={() => router.push(`/lesson/${lesson.id}`)}
+              className="w-full bg-gray-800 p-4 rounded-lg hover:bg-gray-700 text-left flex justify-between"
+            >
+              <span>{lesson.title}</span>
+              <span className={isDone ? "text-green-400" : "text-gray-500"}>
+                {isDone ? "Completed" : "Pending"}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {id === "1" && (
-        <div className="mt-8">
+        <div className="mt-8 flex gap-4">
           <button
             type="button"
             onClick={() => router.push("/quiz/1")}
@@ -71,11 +95,12 @@ export default function ModulePage() {
           >
             Take Git Quiz
           </button>
+
           <button
-             type="button"
-             onClick={() => router.push("/challenge/1")}
-             className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold text-white"
-           >
+            type="button"
+            onClick={() => router.push("/challenge/1")}
+            className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold"
+          >
             Try DevOps Challenge 🎮
           </button>
         </div>

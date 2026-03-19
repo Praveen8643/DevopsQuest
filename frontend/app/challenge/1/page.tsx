@@ -7,7 +7,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
+  type DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -16,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { addXp, unlockBadge } from "../../../lib/progress";
 
 const correctOrder = [
   "Code",
@@ -24,6 +25,9 @@ const correctOrder = [
   "Push to Registry",
   "Deploy to Kubernetes",
 ];
+
+const challengeBadge = "CI/CD Starter";
+const challengeXp = 50;
 
 function SortableItem({ id }: { id: string }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -79,8 +83,10 @@ export default function ChallengePage() {
     const isCorrect = JSON.stringify(items) === JSON.stringify(correctOrder);
 
     if (isCorrect) {
+      const totalXp = addXp(challengeXp);
+      unlockBadge(challengeBadge);
       setResult("Correct! You completed the CI/CD challenge.");
-      setXp(50);
+      setXp(totalXp);
       setBadgeUnlocked(true);
     } else {
       setResult("Not quite. Reorder the steps and try again.");
@@ -131,21 +137,19 @@ export default function ChallengePage() {
                 {result}
               </p>
 
-              {badgeUnlocked && (
+              {badgeUnlocked ? (
                 <>
                   <div className="bg-green-900/30 border border-green-700 rounded-xl p-4">
-                    <p className="text-green-300 font-medium">+50 XP earned</p>
+                    <p className="text-green-300 font-medium">Total XP: {xp}</p>
                   </div>
 
                   <div className="bg-yellow-900/30 border border-yellow-700 rounded-xl p-4">
                     <p className="text-yellow-300 font-medium">
-                      Badge Unlocked: CI/CD Starter
+                      Badge Unlocked: {challengeBadge}
                     </p>
                   </div>
                 </>
-              )}
-
-              {!badgeUnlocked && (
+              ) : (
                 <div className="bg-red-900/20 border border-red-700 rounded-xl p-4">
                   <p className="text-red-300">XP: {xp}</p>
                 </div>
