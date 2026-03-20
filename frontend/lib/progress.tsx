@@ -41,3 +41,19 @@ export function completeLesson(lessonId: number): number[] {
   );
   return updated;
 }
+
+export function getTotalLessons(): number {
+  return 9;
+}
+
+export function getProgressPercent(): number {
+  const completed = getCompletedLessons().length;
+  const total = getTotalLessons();
+  if (total === 0) return 0;
+  return Math.round((completed / total) * 100);
+}
+
+export function isModuleCompleted(moduleLessonIds: number[]): boolean {
+  const completed = getCompletedLessons();
+  return moduleLessonIds.every((id) => completed.includes(id));
+}
