@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isModuleCompleted } from "../../lib/progress";
+import { isModuleCompleted } from "@/lib/progress";
 
 const modules = [
   {
@@ -20,6 +20,31 @@ const modules = [
     title: "Docker",
     lessonIds: [301, 302, 303],
   },
+  {
+    id: 4,
+    title: "Container Registry",
+    lessonIds: [401, 402, 403],
+  },
+  {
+    id: 5,
+    title: "Kubernetes Basics",
+    lessonIds: [501, 502, 503],
+  },
+  {
+    id: 6,
+    title: "Services & Ingress",
+    lessonIds: [601, 602, 603],
+  },
+  {
+    id: 7,
+    title: "Rancher",
+    lessonIds: [701, 702, 703],
+  },
+  {
+    id: 8,
+    title: "CI/CD Pipeline",
+    lessonIds: [801, 802, 803],
+  },
 ];
 
 export default function RoadmapPage() {
@@ -29,13 +54,13 @@ export default function RoadmapPage() {
   useEffect(() => {
     const unlocked = [1];
 
-    if (isModuleCompleted([101, 102, 103])) {
-      unlocked.push(2);
-    }
-
-    if (isModuleCompleted([201, 202, 203])) {
-      unlocked.push(3);
-    }
+    if (isModuleCompleted([101, 102, 103])) unlocked.push(2);
+    if (isModuleCompleted([201, 202, 203])) unlocked.push(3);
+    if (isModuleCompleted([301, 302, 303])) unlocked.push(4);
+    if (isModuleCompleted([401, 402, 403])) unlocked.push(5);
+    if (isModuleCompleted([501, 502, 503])) unlocked.push(6);
+    if (isModuleCompleted([601, 602, 603])) unlocked.push(7);
+    if (isModuleCompleted([701, 702, 703])) unlocked.push(8);
 
     setUnlockedModules(unlocked);
   }, []);

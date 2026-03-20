@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getBadges } from "../../lib/progress";
+import { getBadges } from "@/lib/progress";
 
 export default function BadgesPage() {
   const [badges, setBadges] = useState<string[]>([]);

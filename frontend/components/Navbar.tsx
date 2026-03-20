@@ -1,15 +1,43 @@
-import Link from 'next/link';
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const links = [
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/roadmap", label: "Roadmap" },
+  { href: "/badges", label: "Badges" },
+  { href: "/profile", label: "Profile" },
+];
 
 export default function Navbar() {
+  const pathname = usePathname();
+
   return (
-    <nav className="border-b border-slate-800 bg-slate-950/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between p-4">
-        <Link href="/" className="text-xl font-bold text-cyan-400">DevOps Quest</Link>
-        <div className="flex gap-4 text-sm text-slate-300">
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/roadmap">Roadmap</Link>
-          <Link href="/badges">Badges</Link>
-          <Link href="/login">Login</Link>
+    <nav className="w-full border-b border-slate-800 bg-[#020817] text-white">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <Link href="/" className="text-2xl font-bold text-cyan-400">
+          DevOps Quest
+        </Link>
+
+        <div className="flex flex-wrap gap-3">
+          {links.map((link) => {
+            const active = pathname === link.href;
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                  active
+                    ? "bg-cyan-500 text-black"
+                    : "bg-slate-800 text-white hover:bg-slate-700"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>

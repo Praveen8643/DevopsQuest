@@ -7,7 +7,7 @@ import {
   getCompletedLessons,
   getTotalLessons,
   getProgressPercent,
-} from "../../lib/progress";
+} from "@/lib/progress";
 
 export default function Dashboard() {
   const [xp, setXp] = useState(0);
