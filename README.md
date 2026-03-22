@@ -1,6 +1,6 @@
 # DevOps Quest Starter
 
-A starter monorepo for a web-first DevOps learning game.
+A starter monorepo for a web-first DevOps learning game fun.
 
 ## Stack
 - Frontend: Next.js 14 + TypeScript + Tailwind CSS
