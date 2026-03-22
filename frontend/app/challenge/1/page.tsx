@@ -44,7 +44,7 @@ function SortableItem({ id }: { id: string }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-gray-800 p-4 rounded-xl cursor-grab active:cursor-grabbing text-lg border border-gray-700"
+      className="cursor-grab rounded-xl border border-gray-700 bg-gray-800 p-4 text-lg active:cursor-grabbing"
     >
       {id}
     </div>
@@ -64,6 +64,7 @@ export default function ChallengePage() {
   const [xp, setXp] = useState(0);
   const [badgeUnlocked, setBadgeUnlocked] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -78,13 +79,16 @@ export default function ChallengePage() {
     setItems((currentItems) => arrayMove(currentItems, oldIndex, newIndex));
   }
 
-  function checkAnswer() {
+  async function checkAnswer() {
+    setSubmitting(true);
     setSubmitted(true);
+
     const isCorrect = JSON.stringify(items) === JSON.stringify(correctOrder);
 
     if (isCorrect) {
-      const totalXp = addXp(challengeXp);
-      unlockBadge(challengeBadge);
+      const totalXp = await addXp(challengeXp);
+      await unlockBadge(challengeBadge);
+
       setResult("Correct! You completed the CI/CD challenge.");
       setXp(totalXp);
       setBadgeUnlocked(true);
@@ -93,18 +97,20 @@ export default function ChallengePage() {
       setXp(0);
       setBadgeUnlocked(false);
     }
+
+    setSubmitting(false);
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">Arrange CI/CD Pipeline</h1>
+    <div className="min-h-screen bg-black p-6 text-white">
+      <div className="mx-auto max-w-3xl">
+        <h1 className="mb-4 text-4xl font-bold">Arrange CI/CD Pipeline</h1>
 
-        <p className="text-gray-400 mb-8">
+        <p className="mb-8 text-gray-400">
           Drag and drop the steps into the correct order.
         </p>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -122,12 +128,13 @@ export default function ChallengePage() {
           <button
             type="button"
             onClick={checkAnswer}
-            className="mt-6 bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-6 py-3 rounded-lg"
+            disabled={submitting}
+            className="mt-6 rounded-lg bg-cyan-500 px-6 py-3 font-semibold text-black hover:bg-cyan-400 disabled:opacity-50"
           >
-            Submit Challenge
+            {submitting ? "Submitting..." : "Submit Challenge"}
           </button>
 
-          {submitted && (
+          {submitted ? (
             <div className="mt-6 space-y-3">
               <p
                 className={`text-lg font-semibold ${
@@ -139,23 +146,23 @@ export default function ChallengePage() {
 
               {badgeUnlocked ? (
                 <>
-                  <div className="bg-green-900/30 border border-green-700 rounded-xl p-4">
-                    <p className="text-green-300 font-medium">Total XP: {xp}</p>
+                  <div className="rounded-xl border border-green-700 bg-green-900/30 p-4">
+                    <p className="font-medium text-green-300">Total XP: {xp}</p>
                   </div>
 
-                  <div className="bg-yellow-900/30 border border-yellow-700 rounded-xl p-4">
-                    <p className="text-yellow-300 font-medium">
+                  <div className="rounded-xl border border-yellow-700 bg-yellow-900/30 p-4">
+                    <p className="font-medium text-yellow-300">
                       Badge Unlocked: {challengeBadge}
                     </p>
                   </div>
                 </>
               ) : (
-                <div className="bg-red-900/20 border border-red-700 rounded-xl p-4">
+                <div className="rounded-xl border border-red-700 bg-red-900/20 p-4">
                   <p className="text-red-300">XP: {xp}</p>
                 </div>
               )}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
