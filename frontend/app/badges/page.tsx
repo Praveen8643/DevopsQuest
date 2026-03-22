@@ -5,18 +5,36 @@ import { getBadges } from "@/lib/progress";
 
 export default function BadgesPage() {
   const [badges, setBadges] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setBadges(getBadges());
+    async function loadBadges() {
+      const badgeList = await getBadges();
+      setBadges(badgeList);
+      setLoading(false);
+    }
+
+    loadBadges();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black p-6 text-white">
+        <div className="mx-auto max-w-4xl">
+          <h1 className="mb-6 text-4xl font-bold">Your Badges</h1>
+          <p className="text-gray-400">Loading badges...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6">Your Badges</h1>
+    <div className="min-h-screen bg-black p-6 text-white">
+      <div className="mx-auto max-w-4xl">
+        <h1 className="mb-6 text-4xl font-bold">Your Badges</h1>
 
         {badges.length === 0 ? (
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+          <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
             <p className="text-gray-400">No badges unlocked yet.</p>
           </div>
         ) : (
@@ -24,9 +42,9 @@ export default function BadgesPage() {
             {badges.map((badge) => (
               <div
                 key={badge}
-                className="bg-yellow-900/20 border border-yellow-700 rounded-2xl p-6"
+                className="rounded-2xl border border-yellow-700 bg-yellow-900/20 p-6"
               >
-                <p className="text-yellow-300 text-xl font-semibold">{badge}</p>
+                <p className="text-xl font-semibold text-yellow-300">{badge}</p>
               </div>
             ))}
           </div>

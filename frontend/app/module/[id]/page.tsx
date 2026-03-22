@@ -99,28 +99,49 @@ export default function ModulePage() {
   const module = moduleData[id];
   const [completedLessons, setCompletedLessons] = useState<number[]>([]);
   const [moduleBadgeUnlocked, setModuleBadgeUnlocked] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const completed = getCompletedLessons();
-    setCompletedLessons(completed);
-
-    if (module) {
-      const lessonIds = module.lessons.map((lesson) => lesson.id);
-      const completedModule = isModuleCompleted(lessonIds);
-
-      if (completedModule) {
-        unlockBadge(module.badge);
+    async function loadModuleData() {
+      if (!module) {
+        setLoading(false);
+        return;
       }
 
-      const badges = getBadges();
-      setModuleBadgeUnlocked(badges.includes(module.badge) || completedModule);
+      const completed = await getCompletedLessons();
+      setCompletedLessons(completed);
+
+      const lessonIds = module.lessons.map((lesson) => lesson.id);
+      const completedModule = await isModuleCompleted(lessonIds);
+
+      if (completedModule) {
+        await unlockBadge(module.badge);
+      }
+
+      const badges = await getBadges();
+      setModuleBadgeUnlocked(
+        Array.isArray(badges) && (badges.includes(module.badge) || completedModule)
+      );
+
+      setLoading(false);
     }
+
+    loadModuleData();
   }, [id, module]);
 
   if (!module) {
     return (
-      <div className="min-h-screen bg-black text-white p-6">
+      <div className="min-h-screen bg-black p-6 text-white">
         <h1 className="text-3xl font-bold mb-4">Module not found</h1>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black p-6 text-white">
+        <h1 className="text-3xl font-bold mb-2">{module.title}</h1>
+        <p className="text-gray-400">Loading module...</p>
       </div>
     );
   }
@@ -130,20 +151,20 @@ export default function ModulePage() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen bg-black p-6 text-white">
       <h1 className="text-3xl font-bold mb-2">{module.title}</h1>
       <p className="text-gray-400 mb-2">Choose a lesson to begin</p>
       <p className="text-green-400 mb-6">
         Progress: {completedCount}/{module.lessons.length} lessons completed
       </p>
 
-      {moduleBadgeUnlocked && (
-        <div className="mb-6 bg-yellow-900/20 border border-yellow-700 rounded-xl p-4">
-          <p className="text-yellow-300 font-medium">
+      {moduleBadgeUnlocked ? (
+        <div className="mb-6 rounded-xl border border-yellow-700 bg-yellow-900/20 p-4">
+          <p className="font-medium text-yellow-300">
             Badge Unlocked: {module.badge}
           </p>
         </div>
-      )}
+      ) : null}
 
       <div className="space-y-4">
         {module.lessons.map((lesson) => {
@@ -154,7 +175,7 @@ export default function ModulePage() {
               key={lesson.id}
               type="button"
               onClick={() => router.push(`/lesson/${lesson.id}`)}
-              className="w-full bg-gray-800 p-4 rounded-lg hover:bg-gray-700 text-left flex justify-between"
+              className="flex w-full justify-between rounded-lg bg-gray-800 p-4 text-left hover:bg-gray-700"
             >
               <span>{lesson.title}</span>
               <span className={isDone ? "text-green-400" : "text-gray-500"}>
@@ -169,7 +190,7 @@ export default function ModulePage() {
         <button
           type="button"
           onClick={() => router.push(`/quiz/${id}`)}
-          className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold"
+          className="rounded-lg bg-blue-600 px-6 py-3 font-semibold hover:bg-blue-700"
         >
           Take Quiz
         </button>
@@ -178,7 +199,7 @@ export default function ModulePage() {
           <button
             type="button"
             onClick={() => router.push("/challenge/1")}
-            className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold"
+            className="rounded-lg bg-purple-600 px-6 py-3 font-semibold hover:bg-purple-700"
           >
             Try DevOps Challenge 🎮
           </button>

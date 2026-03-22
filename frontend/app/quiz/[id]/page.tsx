@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { rewardQuizXp, unlockBadge } from "@/lib/progress";
 import { useParams } from "next/navigation";
+import { rewardQuizXp, unlockBadge } from "@/lib/progress";
 
 type QuizQuestion = {
   id: number;
@@ -307,7 +307,12 @@ const quizzes: Record<string, QuizData> = {
       {
         id: 2,
         question: "Which step usually comes before deployment?",
-        options: ["Build and test", "Ingress", "Namespace delete", "Branch removal"],
+        options: [
+          "Build and test",
+          "Ingress",
+          "Namespace delete",
+          "Branch removal",
+        ],
         answer: "Build and test",
       },
       {
@@ -334,12 +339,13 @@ export default function QuizPage() {
     {}
   );
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [xpMessage, setXpMessage] = useState("");
   const [badgeMessage, setBadgeMessage] = useState("");
 
   if (!quiz) {
     return (
-      <div className="min-h-screen bg-black text-white p-6">
+      <div className="min-h-screen bg-black p-6 text-white">
         <h1 className="text-3xl font-bold">Quiz not found</h1>
       </div>
     );
@@ -369,25 +375,28 @@ export default function QuizPage() {
     }));
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
+    setSubmitting(true);
     setSubmitted(true);
 
     if (passed) {
-      const totalXp = rewardQuizXp(Number(quizId), quiz.xpReward);
-      unlockBadge(quiz.badge);
+      const totalXp = await rewardQuizXp(Number(quizId), quiz.xpReward);
+      await unlockBadge(quiz.badge);
       setXpMessage(`Quiz passed. Total XP: ${totalXp}`);
       setBadgeMessage(`Badge Unlocked: ${quiz.badge}`);
     } else {
       setXpMessage("Quiz not passed yet. Review the lessons and try again.");
       setBadgeMessage("");
     }
+
+    setSubmitting(false);
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen bg-black p-6 text-white">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-2">{quiz.title}</h1>
-        <p className="text-gray-400 mb-8">
+        <h1 className="mb-2 text-4xl font-bold">{quiz.title}</h1>
+        <p className="mb-8 text-gray-400">
           Pass score: {quiz.passPercent}% • Reward: {quiz.xpReward} XP
         </p>
 
@@ -395,9 +404,9 @@ export default function QuizPage() {
           {quiz.questions.map((question, index) => (
             <div
               key={question.id}
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-6"
+              className="rounded-2xl border border-gray-800 bg-gray-900 p-6"
             >
-              <p className="text-xl font-semibold mb-4">
+              <p className="mb-4 text-xl font-semibold">
                 {index + 1}. {question.question}
               </p>
 
@@ -413,7 +422,7 @@ export default function QuizPage() {
                       key={option}
                       type="button"
                       onClick={() => handleSelect(question.id, option)}
-                      className={`w-full text-left p-4 rounded-xl border transition ${
+                      className={`w-full rounded-xl border p-4 text-left transition ${
                         isCorrect
                           ? "border-green-500 bg-green-900/20"
                           : isWrongSelected
@@ -437,17 +446,18 @@ export default function QuizPage() {
           onClick={handleSubmit}
           disabled={
             submitted ||
+            submitting ||
             Object.keys(selectedAnswers).length !== quiz.questions.length
           }
-          className="mt-8 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-6 py-3 rounded-lg font-semibold"
+          className="mt-8 rounded-lg bg-blue-600 px-6 py-3 font-semibold hover:bg-blue-700 disabled:opacity-50"
         >
-          {submitted ? "Quiz Submitted" : "Submit Quiz"}
+          {submitting ? "Submitting..." : submitted ? "Quiz Submitted" : "Submit Quiz"}
         </button>
 
-        {submitted && (
+        {submitted ? (
           <div className="mt-8 space-y-4">
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-              <p className="text-2xl font-bold mb-2">
+            <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
+              <p className="mb-2 text-2xl font-bold">
                 Score: {score}/{quiz.questions.length} ({percent}%)
               </p>
               <p className={passed ? "text-green-400" : "text-red-400"}>
@@ -455,17 +465,17 @@ export default function QuizPage() {
               </p>
             </div>
 
-            <div className="bg-green-900/20 border border-green-700 rounded-2xl p-4">
+            <div className="rounded-2xl border border-green-700 bg-green-900/20 p-4">
               <p className="text-green-300">{xpMessage}</p>
             </div>
 
-            {badgeMessage && (
-              <div className="bg-yellow-900/20 border border-yellow-700 rounded-2xl p-4">
+            {badgeMessage ? (
+              <div className="rounded-2xl border border-yellow-700 bg-yellow-900/20 p-4">
                 <p className="text-yellow-300">{badgeMessage}</p>
               </div>
-            )}
+            ) : null}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

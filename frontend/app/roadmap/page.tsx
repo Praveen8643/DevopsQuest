@@ -50,19 +50,25 @@ const modules = [
 export default function RoadmapPage() {
   const router = useRouter();
   const [unlockedModules, setUnlockedModules] = useState<number[]>([1]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unlocked = [1];
+    async function loadRoadmap() {
+      const unlocked = [1];
 
-    if (isModuleCompleted([101, 102, 103])) unlocked.push(2);
-    if (isModuleCompleted([201, 202, 203])) unlocked.push(3);
-    if (isModuleCompleted([301, 302, 303])) unlocked.push(4);
-    if (isModuleCompleted([401, 402, 403])) unlocked.push(5);
-    if (isModuleCompleted([501, 502, 503])) unlocked.push(6);
-    if (isModuleCompleted([601, 602, 603])) unlocked.push(7);
-    if (isModuleCompleted([701, 702, 703])) unlocked.push(8);
+      if (await isModuleCompleted([101, 102, 103])) unlocked.push(2);
+      if (await isModuleCompleted([201, 202, 203])) unlocked.push(3);
+      if (await isModuleCompleted([301, 302, 303])) unlocked.push(4);
+      if (await isModuleCompleted([401, 402, 403])) unlocked.push(5);
+      if (await isModuleCompleted([501, 502, 503])) unlocked.push(6);
+      if (await isModuleCompleted([601, 602, 603])) unlocked.push(7);
+      if (await isModuleCompleted([701, 702, 703])) unlocked.push(8);
 
-    setUnlockedModules(unlocked);
+      setUnlockedModules(unlocked);
+      setLoading(false);
+    }
+
+    loadRoadmap();
   }, []);
 
   function handleModuleClick(moduleId: number) {
@@ -71,10 +77,21 @@ export default function RoadmapPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#020817] px-6 py-10 text-white">
+        <div className="mx-auto max-w-5xl">
+          <h1 className="mb-10 text-5xl font-bold">DevOps Roadmap</h1>
+          <p className="text-gray-400">Loading roadmap...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#020817] text-white px-6 py-10">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-5xl font-bold mb-10">DevOps Roadmap</h1>
+    <div className="min-h-screen bg-[#020817] px-6 py-10 text-white">
+      <div className="mx-auto max-w-5xl">
+        <h1 className="mb-10 text-5xl font-bold">DevOps Roadmap</h1>
 
         <div className="space-y-5">
           {modules.map((module) => {
@@ -88,8 +105,8 @@ export default function RoadmapPage() {
                 disabled={!isUnlocked}
                 className={`w-full rounded-2xl p-6 text-left text-2xl font-medium transition ${
                   isUnlocked
-                    ? "bg-slate-800 hover:bg-slate-700 cursor-pointer"
-                    : "bg-slate-900 text-gray-500 cursor-not-allowed border border-slate-800"
+                    ? "cursor-pointer bg-slate-800 hover:bg-slate-700"
+                    : "cursor-not-allowed border border-slate-800 bg-slate-900 text-gray-500"
                 }`}
               >
                 <div className="flex items-center justify-between">
